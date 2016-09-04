@@ -50,7 +50,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "dynamixel_sdk.h"                                  // Uses Dynamixel SDK library
+#include "dynamixel_sdk.h"                                 // Uses Dynamixel SDK library
+
+// Test Code Header
+#include <time.h>
 
 // Control table address
 #define ADDR_MX_TORQUE_ENABLE           24                  // Control table address is different in Dynamixel model
@@ -187,6 +190,11 @@ int main()
     if (getch() == ESC_ASCII_VALUE)
       break;
 
+  	// -------Test Code Begins---------------
+  	struct timespec tstart={0,0}, tend={0,0};
+  	clock_gettime(CLOCK_MONOTONIC, &tstart);
+  	// -------Test Code Ends---------------
+
     // Write goal position
     write2ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_MX_GOAL_POSITION, dxl_goal_position[index]);
     if ((dxl_comm_result = getLastTxRxResult(port_num, PROTOCOL_VERSION)) != COMM_SUCCESS)
@@ -214,6 +222,15 @@ int main()
       printf("[ID:%03d] GoalPos:%03d  PresPos:%03d\n", DXL_ID, dxl_goal_position[index], dxl_present_position);
 
     } while ((abs(dxl_goal_position[index] - dxl_present_position) > DXL_MOVING_STATUS_THRESHOLD));
+
+
+  	// -------Test Code Begins---------------
+  	clock_gettime(CLOCK_MONOTONIC, &tend);
+  	printf("some_long_computation took about %.5f seconds\n",
+           ((double)tend.tv_sec + 1.0e-9*tend.tv_nsec) - 
+           ((double)tstart.tv_sec + 1.0e-9*tstart.tv_nsec));
+  	// -------Test Code Ends---------------
+
 
     // Change goal position
     if (index == 0)
